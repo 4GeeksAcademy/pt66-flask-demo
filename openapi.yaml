@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: Example API spec
+  description: |-
+    This is a sample API spec for the 4Geeks Academy seminar on June 4th, 2024.
+  version: 0.0.1
+tags:
+  - name: CRUD
+    description: Some basic CRUD operations
+paths:
+  /crud:
+    post:
+      tags:
+        - CRUD
+      summary: Create a document on the server
+      description: |-
+        POST requests are intended to create data that the server will store.  Data is usually sent to
+        the server through the body of the HTTP response, but sometimes you just make a request to the
+        server and it will send back something it created for you.
+      operationId: addData
+      requestBody:
+        description: Create some new data.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Data"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/Data"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Data"
+        required: false
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataResponse"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/DataResponse"
+        "400":
+          description: Invalid input
+        "422":
+          description: Validation exception
+    get:
+      tags:
+        - CRUD
+      summary: Get a document from the server
+      description: |-
+        A GET request is meant to return data from the server without changing or mutating it
+        in the database.  GET requests shouldn't change the state of the data on the server,
+        but they can process the data you get back from it.
+        GET requests have no body, so any information you pass in has to be in either the
+        headers, the URL, or in query parameters.
+      operationId: getData
+      parameters:
+        - name: status
+          in: query
+          description: Status values that need to be considered for filter
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: available
+            enum:
+              - available
+              - pending
+              - sold
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PluralData"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/PluralData"
+        "400":
+          description: Invalid status value
+  /crud/{data_id}:
+    put:
+      tags:
+        - CRUD
+      summary: Update a document on the server
+      description: |-
+        A PUT request is used to update data that already exists on the server.  In this
+        example, we are passing in an ID for a specific document in the URL, and sending
+        an updated object in the body of the request.
+      operationId: updateData
+      parameters:
+        - in: path
+          name: data_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the data to get
+      requestBody:
+        description: Update an existent pet in the store
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Data"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/Data"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Data"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataResponse"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/DataResponse"
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Data not found
+        "422":
+          description: Validation exception
+    delete:
+      tags:
+        - CRUD
+      summary: Delete a document on the server
+      description: |-
+        A DELETE request is meant to remove data from the server.  In this example,
+        we are passing the ID for the object to the server in the URL, and we are expecting
+        an empty (but successful!) response from the server.
+      operationId: deleteData
+      parameters:
+        - in: path
+          name: data_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the data to delete
+      responses:
+        "204":
+          description: Operation successful
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Data not found
+components:
+  schemas:
+    Data:
+      type: object
+      properties:
+        query:
+          type: object
+        headers:
+          type: object
+        body:
+          type: object
+    DataResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        query:
+          type: object
+        headers:
+          type: object
+        body:
+          type: object
+    PluralData:
+      type: object
+      properties:
+        data_points:
+          type: array
+          items:
+            $ref: "#/components/schemas/Data"
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: "##default"
+  requestBodies:
+    Data:
+      description: Data to be added to the application
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Data"
+        application/xml:
+          schema:
+            $ref: "#/components/schemas/Data"
+    DataArray:
+      description: An array of data objects.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Data"
