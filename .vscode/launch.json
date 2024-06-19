@@ -13,7 +13,7 @@
         "FLASK_APP": "main.py",
         "FLASK_DEBUG": "1"
       },
-      "args": ["run"],
+      "args": ["run", "--debug", "--reload", "-p", "3000"],
       "jinja": true,
       "autoStartBrowser": false
     },
